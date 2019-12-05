@@ -1,13 +1,42 @@
 <template>
   <div>
-    <nuxt />
+    <loading v-if="isLoading" />
+    <div>
+      <nuxt />
+    </div>
   </div>
 </template>
 
+<script>
+import loading from "@/components/loading";
+
+export default {
+  components: "loading",
+  data() {
+    return {
+      user: {},
+      isLoading: true
+    };
+  },
+  async created() {
+    await firebase.auth().onAuthStateChanged(user => {
+      this.user = user ? user : { id: 0 };
+      if (this.user === { id: 0 }) {
+        this.isLoading = false;
+        this.$router.push("/logIn");
+      } else {
+        this.$store.commit("setUser", this.user);
+        this.isLoading = false;
+      }
+    });
+  }
+};
+</script>
+
 <style>
 html {
-  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
   word-spacing: 1px;
   -ms-text-size-adjust: 100%;

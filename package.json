@@ -15,7 +15,8 @@
     "@nuxtjs/dotenv": "^1.4.0",
     "@nuxtjs/pwa": "^3.0.0-0",
     "firebase": "^7.5.0",
-    "nuxt": "^2.0.0"
+    "nuxt": "^2.0.0",
+    "vue-nl2br": "^0.1.2"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.9.0"
