@@ -1,4 +1,12 @@
+# watalの開発メモ
+
+## firebase.jsonの初期値
+
+```
 {
+  "database": {
+    "rules": "database.rules.json"
+  },
   "hosting": {
     "public": "dist",
     "ignore": [
@@ -14,3 +22,4 @@
     ]
   }
 }
+```
