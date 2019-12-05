@@ -1,5 +1,30 @@
-
+import colors from 'vuetify/es5/util/colors'
+require('dotenv').config();
+const { API_KEY } = process.env;
+const { AUTH_DOMAIN } = process.env;
+const { DATABASE_URL } = process.env;
+const { PROJECT_ID } = process.env;
+const { STORAGE_BUCKET } = process.env;
+const { MESSAGING_SENDER_ID } = process.env;
+const { APP_ID } = process.env;
+const { BASE_URL } = process.env;
 export default {
+  mode: 'spa',
+  env: {
+    // baseUrl: process.env.BASE_URL,
+    BASE_URL,
+    API_KEY,
+    AUTH_DOMAIN,
+    DATABASE_URL,
+    PROJECT_ID,
+    STORAGE_BUCKET,
+    MESSAGING_SENDER_ID,
+    APP_ID
+  },
+
+
+
+
   mode: 'spa',
   /*
   ** Headers of the page
@@ -57,7 +82,7 @@ export default {
     /*
     ** You can extend webpack config here
     */
-    extend (config, ctx) {
+    extend(config, ctx) {
     }
   }
 }
