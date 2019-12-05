@@ -1,4 +1,6 @@
-import firebase from "firebase"
+import firebase from "firebase";
+
+
 var firebaseConfig = {
     apiKey: process.env.API_KEY,
     authDomain: process.env.AUTH_DOMAIN,
