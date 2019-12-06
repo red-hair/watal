@@ -1,6 +1,6 @@
 <template>
   <div>
-    <loading v-if="isLoading" />
+    <!-- <loading v-if="isLoading" /> -->
     <div>
       <nuxt />
     </div>
@@ -17,19 +17,19 @@ export default {
       user: {},
       isLoading: true
     };
-  },
-  async created() {
-    await firebase.auth().onAuthStateChanged(user => {
-      this.user = user ? user : { id: 0 };
-      if (this.user === { id: 0 }) {
-        this.isLoading = false;
-        this.$router.push("/logIn");
-      } else {
-        this.$store.commit("setUser", this.user);
-        this.isLoading = false;
-      }
-    });
   }
+  // async created() {
+  //   await firebase.auth().onAuthStateChanged(user => {
+  //     this.user = user ? user : { id: 0 };
+  //     if (this.user === { id: 0 }) {
+  //       this.isLoading = false;
+  //       this.$router.push("/logIn");
+  //     } else {
+  //       this.$store.commit("setUser", this.user);
+  //       this.isLoading = false;
+  //     }
+  //   });
+  // }
 };
 </script>
 

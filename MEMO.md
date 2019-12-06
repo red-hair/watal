@@ -101,4 +101,18 @@ export default {
 
 ---
 
+## `【dockerでimageが消せないときの対処法】`
 
+`Error response from daemon: conflict: unable to delete 7be6a8478f5f (cannot be forced) - image has dependent child images`
+
+1. 子供のイメージがあって消せないよ〜って言われる時の対処法
+
+`for i in $(docker images -q); do  docker history $i | grep -q 7be6a8478f5f && echo $i; done | sort -u`
+
+2. 上記のコマンドで子供イメージを検索出来る。
+
+`docker rmi -f image名`
+
+3. -fで強制削除オプションとなる。
+
+---
