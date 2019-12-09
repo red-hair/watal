@@ -37,6 +37,12 @@ const actions = {
         }).catch(function (error) {
             // An error happened.
         });
+    },
+    authCheck({ commit }) {
+        firebase.auth().onAuthStateChanged(user => {
+            commit("setUser", user)
+            commit("changeLoading", false)
+        })
     }
 }
 

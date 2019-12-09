@@ -1,33 +1,48 @@
 <template>
   <div>
     <!-- <loading v-if="isLoading" /> -->
-    <div>
+    <div v-if="loading">
+      <loading />
+    </div>
+    <div v-if="currentUser">
       <nuxt />
     </div>
   </div>
 </template>
 
 <script>
-import loading from "@/components/loading";
+import firebase from "@/plugins/firebase";
+import Loading from "@/components/Loading";
+import { mapState } from "vuex";
 
 export default {
-  components: "loading",
+  components: { Loading },
   data() {
     return {
-      user: {},
-      isLoading: true
+      user: {}
+      // isLoading: true
     };
+  },
+  computed: {
+    currentUser() {
+      return this.$store.state.user;
+    },
+    loading() {
+      return this.$store.state.loading;
+    }
   }
-  // async created() {
-  //   await firebase.auth().onAuthStateChanged(user => {
-  //     this.user = user ? user : { id: 0 };
-  //     if (this.user === { id: 0 }) {
-  //       this.isLoading = false;
-  //       this.$router.push("/logIn");
-  //     } else {
-  //       this.$store.commit("setUser", this.user);
-  //       this.isLoading = false;
-  //     }
+  // computed: mapState({
+  //   currentUser: "user",
+  //   loading: "loading"
+  // })
+  // async fetch({ store }) {
+  //   this.$store.dispatch("authCheck");
+  // },
+  // created() {
+  //   firebase.auth().onAuthStateChanged(user => {
+  //     this.$store.commit("setUser", user);
+  //     // this.user = this.$store.state.user
+  //     this.isLoading = false;
   //   });
   // }
 };

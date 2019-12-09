@@ -48,7 +48,7 @@ npm install firebase --save
 2. this.$store.state === state　と省略出来るようになる。
 3. variable: "state内の値（例: "user"）" stateも記述の仕方次第で省略出来る。
 
-```
+```javascript
 <script>
 import { mapState } from "vuex";
 
@@ -116,3 +116,209 @@ export default {
 3. -fで強制削除オプションとなる。
 
 ---
+
+## `【おのキャンのloadingコンポーネント参考記述】`
+
+```javascript
+<template>
+  <div class="wrapper">
+    <div class="spinner">
+      <div class="rect1"></div>
+      <div class="rect2"></div>
+      <div class="rect3"></div>
+      <div class="rect4"></div>
+      <div class="rect5"></div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {};
+</script>
+
+<style lang="scss" scoped>
+$theme-color: #25b290;
+.wrapper {
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  background: rgba(107, 107, 107, 0.87);
+}
+.spinner {
+  margin: 200px auto;
+  width: 100px;
+  height: 120px;
+  text-align: center;
+  font-size: 20px;
+}
+.spinner > div {
+  background-color: $theme-color;
+  height: 100%;
+  width: 10px;
+  display: inline-block;
+  -webkit-animation: sk-stretchdelay 1.2s infinite ease-in-out;
+  animation: sk-stretchdelay 1.2s infinite ease-in-out;
+}
+.spinner .rect2 {
+  -webkit-animation-delay: -1.1s;
+  animation-delay: -1.1s;
+}
+.spinner .rect3 {
+  -webkit-animation-delay: -1s;
+  animation-delay: -1s;
+}
+.spinner .rect4 {
+  -webkit-animation-delay: -0.9s;
+  animation-delay: -0.9s;
+}
+.spinner .rect5 {
+  -webkit-animation-delay: -0.8s;
+  animation-delay: -0.8s;
+}
+@-webkit-keyframes sk-stretchdelay {
+  0%,
+  40%,
+  100% {
+    -webkit-transform: scaleY(0.4);
+  }
+  20% {
+    -webkit-transform: scaleY(1);
+  }
+}
+@keyframes sk-stretchdelay {
+  0%,
+  40%,
+  100% {
+    transform: scaleY(0.4);
+    -webkit-transform: scaleY(0.4);
+  }
+  20% {
+    transform: scaleY(1);
+    -webkit-transform: scaleY(1);
+  }
+}
+</style>
+```
+
+```javascript
+<template>
+  <div>
+    <div v-if="loading">
+      <loading></loading>
+    </div>
+    <div v-if="!mount">
+      <mount></mount>
+    </div>
+    <div class="main" v-else>
+      <div v-if="smallLoading">
+        <small-loading></small-loading>
+      </div>
+
+      <div class="success">
+        <success> {{message}} </success>
+      </div>
+      <nav-bar></nav-bar>
+      <!-- PC用NavBar -->
+      <div class="wrapper">
+        <nuxt></nuxt>
+        <div class="footer">
+          <footer-bar></footer-bar>
+        </div>
+      </div>
+
+      <smart-nav></smart-nav>
+    </div>
+
+  </div>
+</template>
+
+<script>
+import Mount from "@/components/atoms/Mount";
+import SmallLoading from "@/components/atoms/SmallLoading";
+import Loading from "@/components/atoms/Loading";
+import Success from "@/components/atoms/Success";
+import NavBar from "@/components/atoms/NavBar";
+import SmartNav from "@/components/atoms/SmartNav";
+import FooterBar from "@/components/atoms/FooterBar";
+import firebase from "../plugins/firebase";
+import { magGetters } from "vuex";
+import axios from "axios";
+import { setTimeout } from "timers";
+
+export default {
+  components: {
+    NavBar,
+    Success,
+    SmartNav,
+    Mount,
+    FooterBar,
+    SmallLoading,
+    Loading
+  },
+  data(){
+    return {
+      route: this.$route.params.path,
+      token: null
+    };
+  },
+  computed: {
+    mount() {
+      return this.$store.state.auth.mount;
+    },
+    message() {
+      return this.$store.state.auth.message;
+    },
+    smallLoading() {
+      return this.$store.state.smallLoading;
+    }
+  }
+}
+
+</script>
+```
+
+
+1. pluginsのauthcheckedでしたっけ。あそこのauthStateChanged関数でstoreにuserをcommitした直後に
+store.commit('changeLoading', false)
+をする感じです。
+2. そうすればstoreにuserが入った後に,storeのloadingがfalseになり、
+default.vueで差し込んでるloadingコンポーネントのv-ifが外れてくれます。
+
+*実際の記述で追記する必要あり*
+
+---
+
+## `【コンポーネント作成時の処理が行われる順番】`
+
+1. asyncData
+  * コンポーネントが呼ばれる前にDataの初期値がセットされる。
+  * レンダリング前にデータをセットするためにasyncDataが使われる。
+2. fetch
+  * Dataがセットされた後にstoreに値がsetさせる
+3. created
+  * コンポーネント作成と同時にレンダリングが開始される。
+  * ここでaxiosなどで値を取得しに行っても、レンダリングは待ってくれない（と思われる）
+4. mounted
+  * DOMがmountされる。レンダリングされてユーザーに一度createdでセットされた値が表示された後に処理が行われる
+5. updated
+  * v-modelなどでdataの値が書き換わったり、computedなどで値が更新されてDOMが更新される度にupdatedのライフサイクルが走る。
+6. destroyed
+  * ページ遷移を行うなど、DOMから離れた時に走るメソッド。リロードでは恐らく走らない。
+
+---
+
+## `【ローカルストレージ&セッションストレージ&キャッシュの違い】`
+
+* セッションストレージ
+  1. ブラウザのWindowが閉じられるまでの間、値を保持してくれる
+  2. リロードされても値はリセットされない。
+* ローカルストレージ
+  1. Windowが閉じられても値を保持し続ける。
+* 共通事項
+  1. サーバー側で値を保持するため、ユーザが改ざん出来ない
+
+* キャッシュ
+  1. ブラウザが持つ様々な値
+  2. スーパーリロードやキャッシュの削除など、ユーザー側で値を消去したり、変更を加える事ができる。

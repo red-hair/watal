@@ -3,8 +3,8 @@
     <header class="header">
       <h1>Chat</h1>
       <!-- ログイン時にはフォームとログアウトボタンを表示 -->
-      <div v-if="user.uid" key="login">
-        [{{ user.displayName }}]
+      <div v-if="currentUser.uid" key="login">
+        [{{ currentUser.displayName }}]
         <button type="button" @click="signOutGoogle">ログアウト</button>
       </div>
       <!-- 未ログイン時にはログインボタンを表示 -->
@@ -15,7 +15,7 @@
 
     <!-- Firebaseから取得したリストを描画(トランジション付き) -->
     <transition-group name="chat" tag="div" class="list content">
-      <section v-for="{ key, name, iamge, message } in chat" :key="key" class="item">
+      <section v-for="{ key, name, image, message } in chat" :key="key" class="item">
         <div class="item-image">
           <img :src="image" width="40" height="40" />
         </div>
@@ -30,8 +30,8 @@
 
     <!-- 入力フォーム -->
     <form action @submit.prevent="doSend" class="form">
-      <textarea v-model="input" :disabled="!user.uid" @keydown.enter.exact.prevent="doSend"></textarea>
-      <button type="submit" :disabled="!user.uid" class="send-button">Send</button>
+      <textarea v-model="input" :disabled="!currentUser.uid" @keydown.enter.exact.prevent="doSend"></textarea>
+      <button type="submit" :disabled="!currentUser.uid" class="send-button">Send</button>
     </form>
   </div>
 </template>
@@ -39,48 +39,72 @@
 <script>
 import firebase from "@/plugins/firebase";
 import Nl2br from "vue-nl2br";
+import { mapState } from "vuex";
 
 export default {
   components: { Nl2br },
   data() {
     return {
-      user: {}, //ユーザー情報
+      // user: {}, //ユーザー情報
       chat: [], //取得したメッセージを入れる配列
       input: "" //入力したメッセージ
     };
   },
-  async created() {
-    //実は async awaitは firebaseのメソッドには効果がない。そのため慣習的に記述しているだけです...
-    try {
-      await firebase.auth().onAuthStateChanged(user => {
-        this.user ? user : { id: 0 }; //TODO:コンポーネントのデータにcurrentUserを格納するのではなくVuexで管理する用に記述を変更する。
-        const ref_message = firebase.database().ref("message");
-        if (user) {
-          this.chat = [];
-          // messageに変更があったときのハンドラを登録
-          ref_message.limitToLast(10).on("child_added", this.childAdded);
-        } else {
-          // messageに変更があったときのハンドラを解除
-          ref_mesage.limitToLast(10).off("child_added", this.childAdded);
-        }
-      });
-    } catch (error) {
-      console.log(error);
+  computed: {
+    currentUser() {
+      return this.$store.state.user;
     }
+  },
+  // computed: mapState({
+  //   currentUser: "user"
+  // }),
+  created() {
+    // firebase.auth().onAuthStateChanged(user => {
+    //   console.log("user", user);
+    //   // this.user ? user : { id: 0 }; //TODO:コンポーネントのデータにcurrentUserを格納するのではなくVuexで管理する用に記述を変更する。
+    //   this.user ? user : {};
+    //   console.log("this.user", this.user);
+    //   const ref_message = firebase.database().ref("message");
+    //   if (user) {
+    //     this.chat = [];
+    //     // messageに変更があったときのハンドラを登録
+    //     ref_message.limitToLast(10).on("child_added", this.childAdded);
+    //   } else {
+    //     // messageに変更があったときのハンドラを解除
+    //     ref_message.limitToLast(10).off("child_added", this.childAdded);
+    //   }
+    // });
+    // this.user ? this.currentUser : {};
+    const ref_message = firebase.database().ref("message");
+    if (this.currentUser) {
+      this.chat = [];
+      // messageに変更があったときのハンドラを登録
+      ref_message.limitToLast(10).on("child_added", this.childAdded);
+    } else {
+      // messageに変更があったときのハンドラを解除
+      ref_message.limitToLast(10).off("child_added", this.childAdded);
+    }
+    // console.log("child_added", child_added);
+    console.log("this.childAdded", this.childAdded);
   },
   methods: {
     // googleログイン認証のため、userにセットされる値が違うためエラーが出るかも
-    doLogin() {
-      this.$store.dispatch("logInGoogle");
+    async doLogin() {
+      await this.$store.dispatch("logInGoogle");
+      console.log("this.$store.state.user", this.$store.state.user);
+      // this.user = this.$store.state.user;
+      console.log("this.user", this.user);
+      // const provider = new firebase.auth.GoogleAuthProvider();
+      // firebase.auth().signInWithPopup(provider);
     },
     // ログアウト処理
     doLogout() {
-      firebas.auth().signOut();
+      firebase.auth().signOut();
     },
     // スクロール位置を一番下に移動
     scrollBottom() {
       this.$nextTick(() => {
-        window.scrollTo(0, docment.body.clientHight);
+        window.scrollTo(0, document.body.clientHeight);
       });
     },
     // 受け取ったメッセージをchatに追加
@@ -96,7 +120,8 @@ export default {
       this.scrollBottom(); //さっき定義した関数を処理後に呼び出す
     },
     doSend() {
-      if (this.user.uid && this.input.length) {
+      if (this.currentUser.uid && this.input.length) {
+        let that = this;
         // firebaseにメッセージを追加
         firebase
           .database()
@@ -104,18 +129,20 @@ export default {
           .push(
             {
               message: this.input,
-              name: this.user.displayName,
-              image: this.user.photoURL
+              name: this.currentUser.displayName,
+              image: this.currentUser.photoURL
             },
+            // ここまでは成功してる
             () => {
-              this.input = ""; //フォームを空にする
+              that.input = ""; //フォームを空にする
             }
           );
       }
+    },
+    signOutGoogle() {
+      this.$store.dispatch("signOutGoogle");
+      this.$router.push("/logIn");
     }
-    // signOutGoogle() {
-    //   this.$store.dispatch("signOutGoogle");
-    //   this.$router.push("/logIn");
   }
 };
 </script>

@@ -47,6 +47,7 @@ export default {
   ** Plugins to load before mounting the App
   */
   plugins: [
+    "@/plugins/authCheck"
   ],
   /*
   ** Nuxt.js dev-modules
@@ -62,7 +63,7 @@ export default {
     '@nuxtjs/pwa',
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv',
-    // '@nuxtjs/vuetify',
+    '@nuxtjs/vuetify',
   ],
   /*
   ** Axios module configuration

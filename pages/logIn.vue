@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <v-app>
     <button @click="logInGoogle">Google認証</button>
-  </div>
+  </v-app>
 </template>
 
 <script>
