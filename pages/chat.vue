@@ -58,7 +58,7 @@ export default {
   // computed: mapState({
   //   currentUser: "user"
   // }),
-  created() {
+  mounted() {
     // firebase.auth().onAuthStateChanged(user => {
     //   console.log("user", user);
     //   // this.user ? user : { id: 0 }; //TODO:コンポーネントのデータにcurrentUserを格納するのではなくVuexで管理する用に記述を変更する。

@@ -80,6 +80,14 @@ export default {
 4. this使いたい時は`アロー関数はダメ`　＜＝　知らなかった...
 5. thisを使いたいときはfunctionで書く！
 
+### `mapの記述パターン集`
+
+[Qiita参考記事](https://qiita.com/suin/items/7331905a45a8ff80d4dd)
+
+1. モジュールごとに記述が別れるみたいなので、storeもクラシックでは無く、モジュールモードで作成するのが吉
+
+---
+
 ## `【Vuexをクラシックモードからモジュールモードへ変更する方法】`
 
 [Qiita参考記事](https://qiita.com/y-miine/items/028c73aa3f87e983ed4c)
@@ -280,11 +288,11 @@ export default {
 ```
 
 
-1. pluginsのauthcheckedでしたっけ。あそこのauthStateChanged関数でstoreにuserをcommitした直後に
-store.commit('changeLoading', false)
-をする感じです。
-2. そうすればstoreにuserが入った後に,storeのloadingがfalseになり、
-default.vueで差し込んでるloadingコンポーネントのv-ifが外れてくれます。
+>pluginsのauthcheckedでしたっけ。あそこのauthStateChanged関数でstoreにuserをcommitした直後に
+>store.commit('changeLoading', false)
+>をする感じです。
+>そうすればstoreにuserが入った後に,storeのloadingがfalseになり、
+>default.vueで差し込んでるloadingコンポーネントのv-ifが外れてくれます。by おのキャン
 
 *実際の記述で追記する必要あり*
 
@@ -322,3 +330,117 @@ default.vueで差し込んでるloadingコンポーネントのv-ifが外れて�
 * キャッシュ
   1. ブラウザが持つ様々な値
   2. スーパーリロードやキャッシュの削除など、ユーザー側で値を消去したり、変更を加える事ができる。
+
+---
+
+## `【firebaseのsnapshotとは？】`
+
+スナップショットとは、ある時点における特定のデータベース参照にあるデータの全体像を写し取ったものです。スナップショットの val() / getValue() を呼び出すと、データの言語固有のオブジェクト表現が返されます。参照先の場所にデータが存在しない場合、スナップショットの値が null になります。Python の get() メソッドは、データの Python 表現を直接返します。Go の Get() 関数は、データを特定のデータ構造にアンマーシャリングします。[firebase公式より](https://firebase.google.com/docs/database/admin/retrieve-data?hl=ja)
+
+---
+
+## `【Firebase Cloud Firestoreの使い方】`
+
+[Qiita参考記事](https://qiita.com/subaru44k/items/a88e638333b8d5cc29f2)
+
+### Firestoreの基本的な用語
+
+1. データ
+  1. `key: value`
+
+2. ドキュメント
+  1. 連想配列、多次元連想配列(jsonのようなネスト構造) [多次元連想配列とは？](https://techacademy.jp/magazine/21621)
+  2. サブコレクションも保持できる。
+    * 多次元連想配列のkeyとして保持できる。
+    * 多次元連想配列を行う際のkeyはサブコレクションじゃなくてもok!
+
+連想配列
+```document
+key1: value1
+key2: value2
+key3: value3
+```
+
+多次元連想配列
+```document
+key1:
+  key11: value11
+  key12: value12
+key2: value2
+```
+
+サブコレクション有りの多次元連想配列
+```document
+key1: value1
+subcollection1: {
+  document1
+  document2
+  document3
+}
+```
+
+3. コレクション
+  1. DBのルート(router.jsやroute.rbのようなイメージ)
+  2. ドキュメントの集合体
+  3. 配下のドキュメントは全て一意な名前を持つ
+  4. ドキュメント作成時にコレクションも自動作成される
+  5. ドキュメントが無くなれば自動破棄される。
+
+```collection
+users: {
+  userdocument1
+  userdocument2
+  userdocument3
+}
+```
+
+4. サブコレクション
+  1. ドキュメント配下に存在するコレクション
+  2. コレクション同様、ドキュメントを配下に取れる。
+  3. ドキュメントとサブコレクションは交互に存在出来る。
+    * ルート直下　=> コレクション
+    * ドキュメント直下 => サブコレクション
+  4. サブコレクションの親のドキュメントを削除しても、サブコレクションは破棄されない。手動で削除する必要有り。
+
+### `dbの階層構造`
+
+```
+db
+ ┗ collection
+      ┗ document - data, data...
+          ┗ sub collection(, sub collection...)
+              ┗ document - data, data ...
+```
+
+### `リレーショナルなdbに置き換えて見ると？`
+
+```案1
+collection =
+document = table
+subcollection = record
+data = column & value
+```
+
+```案2
+collection = table
+document = record
+subcollection =
+data = column & value
+```
+
+### 記事を読みながらメモ
+
+* schemeがないため、columnをmergeしながら追加する事ができる
+  * documentを作成時に値を追加(merge)して保存出来る
+
+#### set() add()
+* setはdocumentを作成してdataをsetする
+  * 第2引数に{ merge: true }を渡すことで既存ドキュメントが存在する場合はdataを統合出来る
+* add()
+  * 一意なIDをドキュメント名に設定して追加(autoincrement)
+
+#### res(docRef)
+* documentを追加した後などは.thenでres(docRef)を受け取る事が可能。
+  * async await対応は多分していない...
+
+

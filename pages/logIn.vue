@@ -11,7 +11,6 @@ export default {
   methods: {
     logInGoogle() {
       this.$store.dispatch("logInGoogle");
-      this.$router.push("/chat");
     }
   }
 };

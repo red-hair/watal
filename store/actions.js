@@ -3,11 +3,13 @@ import firebase from '@/plugins/firebase'
 const actions = {
     logInGoogle({ commit }) {
         const provider = new firebase.auth.GoogleAuthProvider();
+        let vm = this;
         firebase.auth().signInWithPopup(provider).then(function (res) {
             // This gives you a Google Access Token. You can use it to access the Google API.
             // let token = res.credential.accessToken;
             // The signed-in user info.
             commit('setUser', res.user)
+            vm.$router.push('/chat');
             // let user = res.user;
             // ...
         }).catch(function (error) {
