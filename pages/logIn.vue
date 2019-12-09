@@ -6,8 +6,10 @@
 
 <script>
 import firebase from "@/plugins/firebase";
+// import beforeAuth from "@/layouts/beforeAuth";
 
 export default {
+  layout: "beforeAuth",
   methods: {
     logInGoogle() {
       this.$store.dispatch("logInGoogle");

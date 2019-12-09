@@ -15,7 +15,17 @@
 
     <!-- Firebaseから取得したリストを描画(トランジション付き) -->
     <transition-group name="chat" tag="div" class="list content">
-      <section v-for="{ key, name, image, message } in chat" :key="key" class="item">
+      <!-- <section
+        class="message"
+        v-for="{ key, name, image, message } in chat"
+        :key="key"
+        :style="{ own: message.name === currentUser.displayName }"
+      >-->
+      <section
+        v-for="{ key, name, image, message } in chat"
+        :key="key"
+        :class="[message.name === currentUser.displayName ? 'message-own' : 'message']"
+      >
         <div class="item-image">
           <img :src="image" width="40" height="40" />
         </div>
@@ -55,26 +65,9 @@ export default {
       return this.$store.state.user;
     }
   },
-  // computed: mapState({
-  //   currentUser: "user"
-  // }),
   mounted() {
-    // firebase.auth().onAuthStateChanged(user => {
-    //   console.log("user", user);
-    //   // this.user ? user : { id: 0 }; //TODO:コンポーネントのデータにcurrentUserを格納するのではなくVuexで管理する用に記述を変更する。
-    //   this.user ? user : {};
-    //   console.log("this.user", this.user);
-    //   const ref_message = firebase.database().ref("message");
-    //   if (user) {
-    //     this.chat = [];
-    //     // messageに変更があったときのハンドラを登録
-    //     ref_message.limitToLast(10).on("child_added", this.childAdded);
-    //   } else {
-    //     // messageに変更があったときのハンドラを解除
-    //     ref_message.limitToLast(10).off("child_added", this.childAdded);
-    //   }
-    // });
-    // this.user ? this.currentUser : {};
+    // console.log("this.currentUser", this.currentUser);
+
     const ref_message = firebase.database().ref("message");
     if (this.currentUser) {
       this.chat = [];
@@ -84,18 +77,16 @@ export default {
       // messageに変更があったときのハンドラを解除
       ref_message.limitToLast(10).off("child_added", this.childAdded);
     }
-    // console.log("child_added", child_added);
-    console.log("this.childAdded", this.childAdded);
+    // console.log("this.childAdded", this.childAdded);
   },
   methods: {
     // googleログイン認証のため、userにセットされる値が違うためエラーが出るかも
     async doLogin() {
       await this.$store.dispatch("logInGoogle");
-      console.log("this.$store.state.user", this.$store.state.user);
-      // this.user = this.$store.state.user;
-      console.log("this.user", this.user);
-      // const provider = new firebase.auth.GoogleAuthProvider();
-      // firebase.auth().signInWithPopup(provider);
+    },
+    signOutGoogle() {
+      this.$store.dispatch("signOutGoogle");
+      this.$router.push("/logIn");
     },
     // ログアウト処理
     doLogout() {
@@ -110,6 +101,7 @@ export default {
     // 受け取ったメッセージをchatに追加
     // データベースに新しい要素が追加されると随時呼び出される
     childAdded(snap) {
+      let vm = this;
       const message = snap.val();
       this.chat.push({
         key: snap.key,
@@ -117,6 +109,12 @@ export default {
         image: message.image,
         message: message.message
       });
+      console.log(
+        "message.name === currentUser.displayName",
+        message.name === this.currentUser.displayName
+          ? "message-own"
+          : "message"
+      );
       this.scrollBottom(); //さっき定義した関数を処理後に呼び出す
     },
     doSend() {
@@ -132,16 +130,11 @@ export default {
               name: this.currentUser.displayName,
               image: this.currentUser.photoURL
             },
-            // ここまでは成功してる
             () => {
               that.input = ""; //フォームを空にする
             }
           );
       }
-    },
-    signOutGoogle() {
-      this.$store.dispatch("signOutGoogle");
-      this.$router.push("/logIn");
     }
   }
 };
@@ -227,4 +220,24 @@ export default {
   opacity: 0;
   transform: translateX(-1em);
 }
+.message {
+  margin-bottom: 3px;
+}
+.message-own {
+  text-align: right;
+  margin-bottom: 3px;
+}
+.message-own .content {
+  background-color: lightskyblue;
+}
+/* .message {
+  margin-bottom: 3px;
+}
+.message.own {
+  text-align: right;
+  margin-bottom: 3px;
+}
+.message.own .content {
+  background-color: lightskyblue;
+} */
 </style>

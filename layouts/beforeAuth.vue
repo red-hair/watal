@@ -1,10 +1,6 @@
 <template>
   <div>
-    <!-- <loading v-if="isLoading" /> -->
-    <div v-if="loading">
-      <loading />
-    </div>
-    <div v-if="currentUser">
+    <div>
       <nuxt />
     </div>
   </div>
@@ -12,11 +8,8 @@
 
 <script>
 import firebase from "@/plugins/firebase";
-import Loading from "@/components/Loading";
-import { mapState } from "vuex";
 
 export default {
-  components: { Loading },
   data() {
     return {
       user: {}
