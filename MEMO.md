@@ -354,7 +354,7 @@ export default {
     * 多次元連想配列のkeyとして保持できる。
     * 多次元連想配列を行う際のkeyはサブコレクションじゃなくてもok!
 
-連想配列
+連想配列(doc{data, data, data})
 ```document
 key1: value1
 key2: value2
