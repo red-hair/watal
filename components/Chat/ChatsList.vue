@@ -1,18 +1,30 @@
 <template>
-  <div>
-    <li v-for="(message, i) in messages" :key="i">
-      <ul>{{ message.name }}</ul>
-      <ul>{{ message.msg }}</ul>
-      <ul>{{ message.date }}</ul>
-      <img :src="message.photoURL" width="40" height="40" />
-    </li>
-    <!-- <new-message /> -->
-  </div>
+  <v-app>
+    <v-container>
+      <v-row>
+        <v-col cols="12">
+          <div>
+            <ul class="messages" v-chat-scroll>
+              <li v-for="message in messages" :key="message.id">
+                <span>{{ message.name }}</span>
+                <span>{{ message.msg }}</span>
+                <span>{{ message.date }}</span>
+                <img :src="message.photoURL" width="40" height="40" />
+              </li>
+            </ul>
+            <!-- <new-message /> -->
+          </div>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-app>
 </template>
 
 <script>
 import NewMessage from "@/components/Chat/NewMessage";
 import firebase from "@/plugins/firebase";
+import moment from "moment";
+import VueChatScroll from "vue-chat-scroll";
 
 const db = firebase.firestore();
 export default {
@@ -29,7 +41,8 @@ export default {
     let ref = db
       .collection("rooms")
       .doc("roomA")
-      .collection("messages");
+      .collection("messages")
+      .orderBy("date");
     ref.onSnapshot(snapshot => {
       snapshot.docChanges().forEach(change => {
         if (change.type == "added") {
@@ -38,7 +51,7 @@ export default {
             id: doc.id, //idをaddで自動追加しているのでdocの引数にidを取れないから書かなくても良いのかも？
             name: doc.data().name,
             msg: doc.data().msg,
-            date: doc.data().date,
+            date: moment(doc.data().date).format("lll"),
             photoURL: doc.data().photoURL,
             uid: doc.data().uid
           });
@@ -50,5 +63,18 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.messages {
+  max-height: 300px;
+  overflow: auto;
+}
+.messages::-webkit-scrollbar {
+  width: 3px;
+}
+.messages::-webkit-scrollbar-track {
+  background: #bbb;
+}
+.messages::-webkit-scrollbar-thumb {
+  background: #aaa;
+}
 </style>

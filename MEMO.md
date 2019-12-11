@@ -443,4 +443,77 @@ data = column & value
 * documentを追加した後などは.thenでres(docRef)を受け取る事が可能。
   * async await対応は多分していない...
 
+*続きは勉強次第追記していきたいと思います。*
+
+---
+
+## `【chat room 作成と取得（realtime listeningはまだ...）】`
+
+* `onSnapshot`メソッドはlistenしてrealtime databaseとして参照する際に使われる。
+
+[nuxt+firestoreで投稿、投稿一覧作成](https://qiita.com/you8/items/5faa7fb38a121a8e678c)
+
+```javascript
+export default {
+  data() {
+    return {
+      rooms: [],
+      room_name: ""
+      // roomId: this.$route.query.chatroomId || ""
+    };
+  },
+  computed: {
+    currentUser() {
+      return this.$store.state.user;
+    }
+  },
+  methods: {
+    createNewRoom() {
+      db.collection("rooms")
+        .add({
+          name: this.room_name
+        })
+        .then(ref => {
+          console.log("Document written with ID", ref.id);
+        })
+        .catch(function(err) {
+          console.error("Error adding document", error);
+        });
+    }
+  },
+  created() {
+    let ref = db;
+    db.collection("rooms")
+      .get()
+      .then(snapshot => {
+        snapshot.forEach(doc => {
+          this.rooms.push({
+            ...doc.data(),
+            id: doc.id
+          });
+        });
+      });
+    console.log("this.rooms", this.rooms);
+  }
+```
+---
+
+## `【filterとindexOfで重複を無くす方法】`
+
+
+```javascript
+let same_tracks = track_ids.filter(function (same_track, index, track_ids) {
+    let track_durations = track_ids.map(same_track => same_track.duration_ms);
+    let track_same_names = track_ids.map(same_track => same_track.name);
+    return track_durations.indexOf(same_track.duration_ms) === index && track_same_names.indexOf(same_track.name) === index;
+});
+```
+
+1. filter(x(block var), i(index), self(元の配列))
+2. selfをmapで回してほしい値のみの配列を作る
+3. indexOfで重複した値の最初のindexをreturnする。これを繰り返す。
+
+## `【firebaseでrealtimeにlistenする方法　onSnapshotの使い方】`
+
+[Cloud Firestore でリアルタイム アップデートを入手する](https://firebase.google.com/docs/firestore/query-data/listen?hl=ja)
 
