@@ -453,13 +453,14 @@ data = column & value
 
 [nuxt+firestoreで投稿、投稿一覧作成](https://qiita.com/you8/items/5faa7fb38a121a8e678c)
 
+### `firestoreからgetでデータを取得してくる方法`
+
 ```javascript
 export default {
   data() {
     return {
       rooms: [],
       room_name: ""
-      // roomId: this.$route.query.chatroomId || ""
     };
   },
   computed: {
@@ -467,6 +468,13 @@ export default {
       return this.$store.state.user;
     }
   },
+```
+
+1. dataのセットはgetしてきたdataを入れる配列[rooms]
+2. 親コンポーネントなのでcurrentUserをstoreから取得
+  _なるべく子コンポーネントでcurrentUserを取得せず、propsで渡してあげるとレンダリング時に値がセットされているので安心_
+
+```javascript
   methods: {
     createNewRoom() {
       db.collection("rooms")
@@ -481,6 +489,13 @@ export default {
         });
     }
   },
+```
+
+3. collection('rooms')直下に.add(id付きでドキュメントを作成)する。
+4. room_nameにv-modelでバインドした値を挿入して、collectionのnameカラムに保存する。
+_(thenで受け取ったrefをcomputedの値に入れるような仕組みにすれば、onSnapshotを使わなくてもroomListを更新出来るかも。)_
+
+```javascript
   created() {
     let ref = db;
     db.collection("rooms")
@@ -496,6 +511,32 @@ export default {
     console.log("this.rooms", this.rooms);
   }
 ```
+
+5. collectionを指定して、getでdocを取得する
+6. .then(snapshot)を受け取る。snapshotはdocの集合体([doc, doc, doc, doc])なのでforEachで回す。
+7. dataに用意していた空配列にeachでバラバラにしたdataを格納する。一緒にdoc.idも格納する。
+8. pushされたdataをv-forで回す。
+
+### `firestoreからonSnapshotで変更をlistenしながら取得する(realtime)`
+
+```javascript
+created() {
+    db.collection("rooms").onSnapshot(snapshot => {
+      snapshot.docChanges().forEach(change => {
+        this.rooms.push({
+          id: change.doc.id,
+          name: change.doc.data().name
+        });
+      });
+    });
+  }
+```
+
+1. .get()の代わりに.onSnapshotメソッドを使う
+2. resであるsnapshotの.docChanges()をeachで回す
+3. 回したブロック変数を空配列に.pushする
+4. dataでreturnしている値をv-forで回す。
+
 ---
 
 ## `【filterとindexOfで重複を無くす方法】`

@@ -7,7 +7,9 @@
             <v-col cols="12">
               <ul>
                 <li v-for="room in rooms" :key="room.id">
-                  <span>{{ room.name }}</span>
+                  <nuxt-link :to="{ name: 'chat-id', params: { id: room.id } }">
+                    <span>{{ room.name }}</span>
+                  </nuxt-link>
                 </li>
               </ul>
             </v-col>
@@ -66,18 +68,6 @@ export default {
       });
     });
     console.log("this.rooms", this.rooms);
-    // let ref = db;
-    // db.collection("rooms")
-    //   .get()
-    //   .then(snapshot => {
-    //     snapshot.forEach(doc => {
-    //       this.rooms.push({
-    //         ...doc.data(),
-    //         id: doc.id
-    //       });
-    //     });
-    //   });
-    // console.log("this.rooms", this.rooms);
   }
 };
 </script>
