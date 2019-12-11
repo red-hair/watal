@@ -42,9 +42,14 @@
 
     <!-- 入力フォーム -->
     <form action @submit.prevent="doSend" class="form">
-      <textarea v-model="input" :disabled="!currentUser.uid" @keydown.enter.exact.prevent="doSend"></textarea>
+      <textarea
+        v-model="input"
+        required="true"
+        :disabled="!currentUser.uid"
+        @keydown.enter.shift.exact.prevent="doSend"
+      ></textarea>
+      <!-- shift + enter が押された時も doSendが呼ばれる -->
       <button type="submit" :disabled="!currentUser.uid" class="send-button">Send</button>
-      <p class="red-text" v-if="feedback">{{ feedback }}</p>
     </form>
   </div>
 </template>
@@ -138,7 +143,7 @@ export default {
         this.input = null;
         this.feedback = null;
       } else {
-        this.feedback = "メッセージを入力して下さい";
+        this.feedback = "※メッセージを入力して下さい";
       }
     }
   }
@@ -253,5 +258,8 @@ export default {
 }
 .message-own .content {
   background-color: lightskyblue;
+}
+.red-text {
+  color: red;
 }
 </style>
