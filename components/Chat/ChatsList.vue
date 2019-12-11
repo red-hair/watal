@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import NewMessage from "@/components/Chat/NewMessage";
+// import NewMessage from "@/components/Chat/NewMessage";
 import firebase from "@/plugins/firebase";
 import moment from "moment";
 import VueChatScroll from "vue-chat-scroll";
@@ -30,9 +30,9 @@ const db = firebase.firestore();
 export default {
   // TODO:propsでcurrentUserを渡してもらう構造に作り変える。
   name: "Chat",
-  components: {
-    NewMessage
-  },
+  //   components: {
+  //     NewMessage
+  //   },
   data() {
     return {
       messages: []

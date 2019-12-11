@@ -9,7 +9,7 @@ const actions = {
             // let token = res.credential.accessToken;
             // The signed-in user info.
             commit('setUser', res.user)
-            vm.$router.push('/chat');
+            vm.$router.push('/rooms');
             // let user = res.user;
             // ...
         }).catch(function (error) {

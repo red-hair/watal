@@ -519,6 +519,8 @@ _(thenで受け取ったrefをcomputedの値に入れるような仕組みにす
 
 ### `firestoreからonSnapshotで変更をlistenしながら取得する(realtime)`
 
+[Cloud Firestore でリアルタイム アップデートを入手する](https://firebase.google.com/docs/firestore/query-data/listen?hl=ja)
+
 ```javascript
 created() {
     db.collection("rooms").onSnapshot(snapshot => {
@@ -554,7 +556,8 @@ let same_tracks = track_ids.filter(function (same_track, index, track_ids) {
 2. selfをmapで回してほしい値のみの配列を作る
 3. indexOfで重複した値の最初のindexをreturnする。これを繰り返す。
 
-## `【firebaseでrealtimeにlistenする方法　onSnapshotの使い方】`
+## `【vue.js コンポーネント間のdataのやり取り props】`
 
-[Cloud Firestore でリアルタイム アップデートを入手する](https://firebase.google.com/docs/firestore/query-data/listen?hl=ja)
+[(Vue.js)コンポーネントの親子連携を理解する](https://atuweb.net/201704_vuejs-component-cooperation/#%E5%91%BC%E3%81%B3%E5%87%BA%E3%81%97%E5%85%83)
 
+* *分かり次第追記します*

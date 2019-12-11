@@ -1,5 +1,8 @@
 <template>
   <div>
+    <nuxt-link to="/room-test">
+      <button>Back to room list</button>
+    </nuxt-link>
     <chats-list />
     <new-message />
     <!-- <form action @submit.prevent="addMessage">
