@@ -7,7 +7,7 @@
             <v-col cols="12">
               <ul>
                 <li v-for="room in rooms" :key="room.id">
-                  <nuxt-link :to="{ name: 'chat-id', params: { id: room.id } }">
+                  <nuxt-link :to="{ name: 'rooms-id', params: { id: room.id } }">
                     <span>{{ room.name }}</span>
                   </nuxt-link>
                 </li>

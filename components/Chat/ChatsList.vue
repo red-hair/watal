@@ -28,6 +28,7 @@ import VueChatScroll from "vue-chat-scroll";
 
 const db = firebase.firestore();
 export default {
+  // TODO:propsでcurrentUserを渡してもらう構造に作り変える。
   name: "Chat",
   components: {
     NewMessage
@@ -38,9 +39,10 @@ export default {
     };
   },
   created() {
+    console.log("this.$route.params", this.$route.params.id);
     let ref = db
       .collection("rooms")
-      .doc("roomA")
+      .doc(this.$route.params.id)
       .collection("messages")
       .orderBy("date");
     ref.onSnapshot(snapshot => {
@@ -60,6 +62,29 @@ export default {
       //   console.log("snapshot.docChanges()", snapshot.docChanges());
     });
   }
+  //   created() {
+  //     let ref = db
+  //       .collection("rooms")
+  //       .doc("roomA")
+  //       .collection("messages")
+  //       .orderBy("date");
+  //     ref.onSnapshot(snapshot => {
+  //       snapshot.docChanges().forEach(change => {
+  //         if (change.type == "added") {
+  //           let doc = change.doc;
+  //           this.messages.push({
+  //             id: doc.id, //idをaddで自動追加しているのでdocの引数にidを取れないから書かなくても良いのかも？
+  //             name: doc.data().name,
+  //             msg: doc.data().msg,
+  //             date: moment(doc.data().date).format("lll"),
+  //             photoURL: doc.data().photoURL,
+  //             uid: doc.data().uid
+  //           });
+  //         }
+  //       });
+  //       //   console.log("snapshot.docChanges()", snapshot.docChanges());
+  //     });
+  //   }
 };
 </script>
 

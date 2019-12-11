@@ -19,7 +19,8 @@ export default {
   components: { Loading },
   data() {
     return {
-      user: {}
+      user: {},
+      baseUrl: process.env.BASE_URL
       // isLoading: true
     };
   },

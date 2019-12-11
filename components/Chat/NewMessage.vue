@@ -11,6 +11,7 @@
 import firebase from "@/plugins/firebase";
 
 export default {
+  // TODO:propsでcurrentUserを渡してもらう構造に作り変える。
   data() {
     return {
       newMessage: null,
@@ -27,7 +28,7 @@ export default {
       let db = firebase.firestore();
       if (this.newMessage) {
         db.collection("rooms")
-          .doc("roomA")
+          .doc(this.$route.params.id)
           .collection("messages")
           .add({
             msg: this.newMessage,
