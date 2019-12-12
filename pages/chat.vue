@@ -24,7 +24,7 @@
       <section
         v-for="{ key, name, image, message } in chat"
         :key="key"
-        :class="[message.name === currentUser.displayName ? 'message-own' : 'message']"
+        :class="[name === currentUser.displayName ? 'message-own' : 'message']"
       >
         <div class="item-image">
           <img :src="image" width="40" height="40" />

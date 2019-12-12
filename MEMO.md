@@ -561,3 +561,162 @@ let same_tracks = track_ids.filter(function (same_track, index, track_ids) {
 [(Vue.js)コンポーネントの親子連携を理解する](https://atuweb.net/201704_vuejs-component-cooperation/#%E5%91%BC%E3%81%B3%E5%87%BA%E3%81%97%E5%85%83)
 
 * *分かり次第追記します*
+
+---
+
+## `【@keydown キーイベント修飾子のキーの設定方法】`
+
+```javascript
+@keydown.shift.enter.exact.prevent="doSend"
+
+v-onディレクティブ.任意のキー.exact(他のキーを受け付けない).prevent="関数名"
+```
+
+1. keydownやkeyupなどを指定して@(v-on)する。
+2. 任意のキーの名前を打つ。複数なら`任意のキー.任意のキー.任意のキー`のように繋げる
+3. exactは他のキーが入力されていた場合に、入力を受け付けないように制約を設けさせる
+4. preventはsubmitが実行されてもredirectされないようにする。
+5. これでメッセージをshift + enterのキーコンビネーションで送信出来る。
+
+---
+
+## `【messageをrealtimeでlistenする方法（firestore）】`
+
+```javascript
+import firebase from "@/plugins/firebase";
+import Nl2br from "vue-nl2br";
+import moment from "moment"; //timestampを任意の形で表示するためのモジュール
+
+const db = firebase.firestore();
+
+export default {
+  components: { Nl2br },
+  data() {
+    return {
+      user: {}, //ユーザー情報
+      chat: [], //取得したメッセージを入れる配列
+      input: null //v-modelの入力フォームの初期値
+    };
+  },
+  computed: {
+    currentUser() {
+      return this.$store.state.user;
+    }
+  },
+  created() {
+    const ref = db //定数refにはサブコレクションmessages内のdataが全て代入される
+      .collection("rooms")
+      .doc(this.$route.params.id) //rooms/room-id => params内のidのroomを指定
+      .collection("messages")
+      .orderBy("date");
+    ref.onSnapshot(snapshot => { //onSnapshotメソッドでmessages内の変更をlistenしながら値を取得。未だ中身はmessages
+      snapshot.docChanges().forEach(change => { //snapshotを更に分割,ブロック変数`change`には各messageの値が代入
+        if (change.type === "added") { //setメソッドではなく、addで追加されたメッセージのみを取り出す。（addメソッドじゃないとidが自動付与されないため）
+          let doc = change.doc; //長いから変数に代入してるだけ
+          this.chat.push({ //dataに定義している空配列に.pushしていく
+            id: doc.id,
+            name: doc.data().name,
+            message: doc.data().msg,
+            date: moment(doc.data().date).format("lll"),
+            image: doc.data().photoURL,
+            uid: doc.data().uid
+          });
+        }
+      });
+      this.scrollBottom(); //さっき定義した関数を処理後に呼び出す
+      // onSnapshotの処理の範囲内なら再レンダリングされた時もスクロールが効く
+    });
+    console.log("this.chat", this.chat);
+  },
+```
+
+```html
+<transition-group name="chat" tag="div" class="list content">
+      <section
+        v-for="message in chat"
+        :key="message.id"
+        :class="[message.name === currentUser.displayName ? 'message-own' : 'message']"
+      > //三項演算子でcurrentUserの場合はメッセージを右側に表示されるようにクラスバインディングをしている。
+        <div class="item-image">
+          <img :src="message.image" width="40" height="40" /> //srcもv-bindでmessage.imageをバインドして表示
+        </div>
+        <div class="item-detail">
+          <div class="item-name">{{ message.name }}</div>
+          <div
+            :class="[message.name === currentUser.displayName ? 'item-message-own' : 'item-message']"
+          > // 吹き出しの向きを左右入れ替えるためのクラスバインディング
+            <nl2br tag="div" :text="message.message" />
+          </div>
+        </div>
+      </section>
+    </transition-group>
+```
+
+---
+
+## `【firestoreにmessageを保存する方法】`
+
+```javascript
+    doSend() {
+      db.collection("rooms")
+        .doc(this.$route.params.id) // paramsからroom.idを取得
+        .collection("messages")
+        .add({ //addメソッドにすることで自動でmessage.idを付与
+        // カラム名はfirestoreのdb設計に基づく
+          msg: this.input,
+          name: this.currentUser.displayName,
+          date: Date.now(),
+          photoURL: this.currentUser.photoURL,
+          uid: this.currentUser.uid
+        })
+        .catch(err => {
+          console.log("err", err);
+        });
+      this.input = null;
+    }
+```
+---
+
+## `【room付きのchatアプリのfirestore db設計】`
+
+1. authはgoogle認証を使用
+2. currentUserはVuexで管理
+
+```
+db(firebase.firestore())
+ ┗ rooms(collection)
+      ┗ room(document) - { id: 自動付与, room_name: v-modelの値 }
+          ┗ messages(sub collection)
+              ┗ message(document) - { id: 自動付与
+                                      msg: v-modelの値
+                                      name: currentUser
+                                      date: Date.now()
+                                      photoURL: currentUser.photoURL
+                                      uid: currentUser.uid }
+```
+
+## `【FirebaseUIを使用したログイン画面の構築】`
+
+[FirebaseUI + vueでログイン処理](https://qiita.com/okdyy75/items/24e78fdd0f12742b9e82)
+
+[Nuxt/VuexでFirebase Authenticationを使ってユーザー認証機能を作る](https://blog.ikedaosushi.com/entry/2019/04/17/201246)
+
+* ※middlewareでログインのハンドリングをするのはやはり正解かも...
+  * middleware内でログインのしてるかどうかを条件分岐&actionをdispatchしてsetUserする。
+
+例) middleware/authenticated.js
+
+  ```javascript
+  import firebase from '@/plugins/firebase'
+
+  export default function ({ route, store, redirect }) {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        store.dispatch("logInGoogle", user)
+      } else {
+        if(route.name !== "login") redirect("/login")
+      }
+    })
+  }
+  ```
+

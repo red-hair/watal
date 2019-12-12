@@ -58,7 +58,7 @@
 import firebase from "@/plugins/firebase";
 import Nl2br from "vue-nl2br";
 // import { mapState } from "vuex";
-import moment from "moment";
+import moment from "moment"; //timestampを任意の形で表示するためのモジュール
 
 const db = firebase.firestore();
 
@@ -69,8 +69,8 @@ export default {
     return {
       user: {}, //ユーザー情報
       chat: [], //取得したメッセージを入れる配列
-      input: null,
-      feedback: null //入力したメッセージ
+      input: null //v-modelの入力フォームの初期値
+      // feedback: null //入力したメッセージ
     };
   },
   computed: {
@@ -141,9 +141,9 @@ export default {
             console.log("err", err);
           });
         this.input = null;
-        this.feedback = null;
+        // this.feedback = null;
       } else {
-        this.feedback = "※メッセージを入力して下さい";
+        // this.feedback = "※メッセージを入力して下さい";
       }
     }
   }
