@@ -1,13 +1,42 @@
 <template>
   <div>
-    <nuxt />
+    <div v-if="loading">
+      <loading />
+    </div>
+    <div v-if="currentUser">
+      <nuxt />
+    </div>
   </div>
 </template>
 
+<script>
+import firebase from "@/plugins/firebase";
+import Loading from "@/components/Loading";
+import { mapState } from "vuex";
+export default {
+  components: { Loading },
+  data() {
+    return {
+      user: {},
+      baseUrl: process.env.BASE_URL
+      // isLoading: true
+    };
+  },
+  computed: {
+    currentUser() {
+      return this.$store.state.user;
+    },
+    loading() {
+      return this.$store.state.loading;
+    }
+  }
+};
+</script>
+
 <style>
 html {
-  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
   word-spacing: 1px;
   -ms-text-size-adjust: 100%;
