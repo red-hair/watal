@@ -1,19 +1,41 @@
 <template>
   <div>
-    <header class="header">
-      <img class="logo" src="@/assets/logo.png">
+  <v-container>  <!-- グリッド -->
+  <v-row>
+  <v-col cols="ms-3">
+          <!-- <v-card> -->
+          <v-navigation-drawer
+            app clipped fixed v-model="leftDrawer" :mini-variant="leftMiniVariant" expand-on-hover
+      permanent
+          >
+          <!-- <template v-slot:prepend> -->
+        <v-list>
+          <v-list-item>
+            <v-list-item-avatar>
+              <v-img src="https://randomuser.me/api/portraits/women/85.jpg"></v-img>
+            </v-list-item-avatar>
+          </v-list-item>
 
-      <div v-if="currentUser.uid" key="login">
-        [{{currentUser.displayName}}]
-        <!-- v-onと@一緒 -->
-        <button type="button" @click="signOutGoogle">ログイン</button>
-      </div>
-      <div v-else key="logout">
-        <button type="button" @click="doLogin">"ログイン</button>
-      </div>
-    </header>
+          <v-list-item
+            link
+            two-line
+          >
+            <v-list-item-content>
+              <v-list-item-title class="title">Sandra Adams</v-list-item-title>
+              <v-list-item-subtitle>sandra_a88@gmail.com</v-list-item-subtitle>
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-icon>mdi-menu-down</v-icon>
+            </v-list-item-action>
+          </v-list-item>
+        </v-list>
+<!-- </template> -->
+    </v-navigation-drawer>
+    <!-- </v-card> -->
+</v-col>
 
-    <div class="container">
+<v-col class="ms-9">
+    <!-- <div class="container"> -->
         <img class="fish" src="@/assets/fish2.png">
         <img class="fish2" src="@/assets/fish2re.png">
         <img class="fish3" src="@/assets/fish2.png">
@@ -42,9 +64,12 @@
             </div>
           </div>
         </section>
-      </transition-group>
-      
-    </div>
+      </transition-group>  
+    <!-- </div> -->
+  </v-col>
+    </v-row>
+    </v-container>  <!-- グリッド終わり -->
+
     <form action @submit.prevent="doSend" class="form">
       <!-- 入力系はv-model -->
       <!-- enter.exactはenter押した時だけ -->
@@ -67,6 +92,7 @@ export default {
       // user: {}, //ユーザー情報
       chat: [], //取得したメッセージを入れる配列
       input: "" //入力したメッセージ
+      
     };
   },
   computed: {
@@ -157,9 +183,7 @@ export default {
   box-sizing: border-box;
 }
 
-.logo {
-  height: 50px;
-}
+
 
 // fishアニメーション
 .fish{
@@ -189,22 +213,26 @@ export default {
 
 @keyframes fish {
   0% {
-    transform: translate(900px,0px);
+    transform: translate(1200px,0px);
+    opacity: 0.6;
   }
   50% {
     transform: translate(500px,-5px);
+    opacity: 1;
   }
-  90% {
-    transform: translate(100px,0px);
+  100% {
+    transform: translate(-100px,0px);
     opacity: 0;
   }
 }
 @keyframes fish2 {
   0% {
     transform: translate(-100px,90px);
+    opacity: 0.6;
   }
   50% {
     transform: translate(300px,85px);
+    opacity: 1;
   }
   100% {
     transform: translate(900px,90px);
@@ -214,9 +242,11 @@ export default {
 @keyframes fish3 {
   0% {
     transform: translate(900px,190px);
+    opacity: 0.6;
   }
   50% {
     transform: translate(300px,185px);
+    opacity: 1;
   }
   100% {
     transform: translate(-100px,190px);
@@ -226,25 +256,16 @@ export default {
 // fishアニメーションここまで
 
 // 泡アニメーション
-// .bubbles {
-// position: absolute;
-// width: 100%;
-// height: 100%;
-// z-index: 0;
-// overflow: hidden;
-// top: 0;
-// left: 0;
-// }
- 
 .bubble {
 position: absolute;
 bottom: -40;
-width: 40px;
-height: 40px;
+width: 20px;
+height: 20px;
 background-color: transparent;
 border: 1px solid #fff;
 border-radius: 50%;
 animation: bubble 10s ease-in infinite;
+opacity:0.6;
 }
  
 .bubble:nth-child(1) {
@@ -256,7 +277,7 @@ animation-duration: 20s;
  
 .bubble:nth-child(2) {
 left: 20%;
-animation-duration: 15s;
+animation-duration: 20s;
 }
  
 .bubble:nth-child(3) {
@@ -385,5 +406,12 @@ animation-duration: 40s;
 }
 .message-own .content {
   background-color: lightskyblue;
+}
+
+
+@media screen and (min-width: 960px){
+.container {
+    max-width: 100%;
+}
 }
 </style>
